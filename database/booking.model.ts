@@ -32,9 +32,6 @@ const bookingSchema = new Schema<IBooking>(
   }
 );
 
-// Create index on eventId for faster queries
-bookingSchema.index({ eventId: 1 });
-
 // Pre-save hook to verify that the referenced event exists
 bookingSchema.pre('save', async function (next) {
   const booking = this as IBooking;
@@ -54,9 +51,6 @@ bookingSchema.pre('save', async function (next) {
 
   next();
 });
-
-// Create index on eventId or faster queries
-bookingSchema.index({ eventId: 1 });
 
 // Create compound index for common queries (event bookings by date)
 bookingSchema.index({ eventId: 1, createdAt: -1 });

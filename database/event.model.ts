@@ -116,13 +116,36 @@ eventSchema.pre('save', async function (next) {
 
   // Generate slug only if title is new or modified
   if (event.isModified('title')) {
-    event.slug = event.title
+    const baseSlug = event.title
       .toLowerCase()
       .trim()
       .replace(/[^\w\s-]/g, '') // Remove special characters
       .replace(/\s+/g, '-') // Replace spaces with hyphens
       .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
       .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
+
+    // Check for slug uniqueness and handle collisions
+    let uniqueSlug = baseSlug;
+    let suffix = 1;
+    let isUnique = false;
+
+    while (!isUnique) {
+      // Check if slug exists, excluding current document when updating
+      const query: any = { slug: uniqueSlug };
+      if (event._id) {
+        query._id = { $ne: event._id };
+      }
+
+      const existingEvent = await Event.findOne(query);
+      
+      if (!existingEvent) {
+        isUnique = true;
+        event.slug = uniqueSlug;
+      } else {
+        uniqueSlug = `${baseSlug}-${suffix}`;
+        suffix++;
+      }
+    }
   }
 
   // Normalize date to ISO format if modified
