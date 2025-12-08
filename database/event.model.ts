@@ -26,7 +26,7 @@ const eventSchema = new Schema<IEvent>(
       type: String,
       required: [true, 'Title is required'],
       trim: true,
-      maxlength: [1000, 'Title cannot exceed 100 characters'],
+      maxlength: [1000, 'Title cannot exceed 1000 characters'],
     },
     slug: {
       type: String,
